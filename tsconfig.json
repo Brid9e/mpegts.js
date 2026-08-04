@@ -7,11 +7,12 @@
         "target": "es5",
         "experimentalDecorators": true,
         "declaration": true,
-        "declarationDir": "./d.ts/",
-        // Pin the declaration root explicitly: it must not be inferred from the input
-        // set, or generated declarations shift into d.ts/ and overwrite the
-        // hand-written public entry d.ts/mpegts.d.ts.
-        "rootDir": ".",
+        // d.ts/mpegts.d.ts is the hand-written public API surface (the "types" entry
+        // in package.json) and is NOT generated. Emit generated declarations into
+        // d.ts/src/ so that file lies outside declarationDir and cannot be
+        // overwritten, whatever the input set or inferred root happens to be.
+        "declarationDir": "./d.ts/src/",
+        "rootDir": "./src",
         "types": ["node"],
         "lib": ["dom", "es5", "es2015.promise", "es2015.collection", "ESNext", "WebWorker"]
     },

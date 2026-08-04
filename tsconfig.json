@@ -8,6 +8,11 @@
         "experimentalDecorators": true,
         "declaration": true,
         "declarationDir": "./d.ts/",
+        // Pin the declaration root explicitly: it must not be inferred from the input
+        // set, or generated declarations shift into d.ts/ and overwrite the
+        // hand-written public entry d.ts/mpegts.d.ts.
+        "rootDir": ".",
+        "types": ["node"],
         "lib": ["dom", "es5", "es2015.promise", "es2015.collection", "ESNext", "WebWorker"]
     },
     "include": [

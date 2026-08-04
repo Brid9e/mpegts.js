@@ -54,6 +54,19 @@ module.exports = {
 
     devServer: {
         static: ['demo'],
+
+        client: {
+            overlay: {
+                errors: true,
+                warnings: false,
+                // The demo deliberately exercises failure paths (bad URLs, unsupported
+                // codecs, aborted playback), and webpack-dev-server >= 4.13 turns any
+                // uncaught error or unhandled rejection into a full-screen overlay that
+                // makes the page untestable. Errors still surface in the console.
+                runtimeErrors: false
+            }
+        },
+
         proxy: [
             {
                 context: ['/dist'],

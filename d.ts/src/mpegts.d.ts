@@ -14,6 +14,7 @@ declare namespace mpegts {
     export { LoggingControl };
     export const version: any;
 }
+/** @returns {MSEPlayer | NativePlayer} */
 declare function createPlayer(mediaDataSource: any, optionalConfig: any): MSEPlayer | NativePlayer;
 declare function isSupported(): any;
 declare function getFeatureList(): {

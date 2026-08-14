@@ -7,6 +7,7 @@ declare class TransmuxingController {
     _mediaDataSource: any;
     _currentSegmentIndex: number;
     _mediaInfo: any;
+    /** @type {FLVDemuxer | TSDemuxer} */
     _demuxer: FLVDemuxer | TSDemuxer;
     _remuxer: MP4Remuxer;
     _ioctl: IOController;

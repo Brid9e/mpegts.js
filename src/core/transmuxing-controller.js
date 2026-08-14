@@ -76,6 +76,7 @@ class TransmuxingController {
         }
 
         this._mediaInfo = null;
+        /** @type {FLVDemuxer | TSDemuxer} */
         this._demuxer = null;
         this._remuxer = null;
         this._ioctl = null;

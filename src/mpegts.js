@@ -32,7 +32,7 @@ import {InvalidArgumentException} from './utils/exception.js';
 Polyfill.install();
 
 
-// factory method
+/** @returns {MSEPlayer | NativePlayer} */
 function createPlayer(mediaDataSource, optionalConfig) {
     let mds = mediaDataSource;
     if (mds == null || typeof mds !== 'object') {

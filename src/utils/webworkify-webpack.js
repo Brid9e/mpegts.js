@@ -182,6 +182,7 @@ function getRequiredModules (sources, moduleId) {
   return requiredModules
 }
 
+/** @returns {Blob | Worker} */
 module.exports = function (moduleId, options) {
   options = options || {}
   var sources = {

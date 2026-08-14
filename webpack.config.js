@@ -22,6 +22,19 @@ module.exports = {
 
     devtool: 'source-map',
 
+    optimization: {
+        // The worker entry modules (src/core/transmuxing-worker.js and
+        // src/player/player-engine-worker.ts) are only ever reached through
+        // work(require.resolve(...)), which yields a module id rather than a binding, so
+        // nothing in the bundle statically imports their default export. webpack 5's
+        // usedExports analysis therefore marks that export unused and the minifier drops
+        // the module body, leaving an import-only stub. webworkify evaluates
+        // `f.default || f` to `{}` inside the generated Worker, so `new f(self)` throws
+        // and both worker paths silently fall back to running on the main thread.
+        // webpack 4 kept the exports; this regressed in the webpack 5 migration.
+        usedExports: false
+    },
+
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json'],
         fallback: {

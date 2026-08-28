@@ -1,5 +1,5 @@
 {
-  "name": "mpegts.js",
+  "name": "@brid9e/mpegts.js",
   "version": "1.8.2",
   "description": "HTML5 MPEG2-TS Stream Player",
   "main": "./dist/mpegts.js",
@@ -40,5 +40,9 @@
     "webpack-dev-server": "^6.0.0"
   },
   "author": "zheng qian <xqq@xqq.im>",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
 }

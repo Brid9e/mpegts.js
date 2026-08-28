@@ -82,6 +82,8 @@ class MSEController {
             video: [],
             audio: []
         };
+
+        this._audioDisabled = false;
     }
 
     destroy() {
@@ -214,6 +216,11 @@ class MSEController {
     }
 
     appendInitSegment(initSegment, deferred = undefined) {
+        if (initSegment.type === 'audio' && this._audioDisabled) {
+            // Audio has been disabled due to unsupported codec, ignore audio init segment
+            return;
+        }
+
         if (!this._mediaSource || this._mediaSource.readyState !== 'open' || this._mediaSource.streaming === false) {
             // sourcebuffer creation requires mediaSource.readyState === 'open'
             // so we defer the sourcebuffer creation, until sourceopen event triggered
@@ -224,6 +231,7 @@ class MSEController {
         }
 
         let is = initSegment;
+
         let mimeType = `${is.container}`;
         if (is.codec && is.codec.length > 0) {
             if (is.codec === 'opus' && Browser.safari) {
@@ -245,6 +253,15 @@ class MSEController {
                     sb.addEventListener('error', this.e.onSourceBufferError);
                     sb.addEventListener('updateend', this.e.onSourceBufferUpdateEnd);
                 } catch (error) {
+                    if (is.type === 'audio' && this._config.autoDisableAudioOnUnsupportedCodec === true) {
+                        Log.w(this.TAG, 'Auto disable audio track due to MSE addSourceBuffer error: ' + error.message);
+                        this._audioDisabled = true;
+                        // drop any queued audio init/media segments
+                        this._pendingSegments.audio.length = 0;
+                        this._pendingSourceBufferInit = this._pendingSourceBufferInit.filter(s => s.type !== 'audio');
+                        this._emitter.emit(MSEEvents.AUDIO_DISABLED);
+                        return;
+                    }
                     Log.e(this.TAG, error.message);
                     this._emitter.emit(MSEEvents.ERROR, {code: error.code, msg: error.message});
                     return;
@@ -274,6 +291,11 @@ class MSEController {
     }
 
     appendMediaSegment(mediaSegment) {
+        if (mediaSegment.type === 'audio' && this._audioDisabled) {
+            // Audio has been disabled due to unsupported codec, ignore audio media segment
+            return;
+        }
+
         let ms = mediaSegment;
         this._pendingSegments[ms.type].push(ms);
 

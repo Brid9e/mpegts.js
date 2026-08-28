@@ -26,6 +26,8 @@ declare class NativePlayer {
         autoCleanupMinBackwardDuration: number;
         statisticsInfoReportInterval: number;
         fixAudioTimestampGap: boolean;
+        autoDisableAudioOnUnsupportedCodec: boolean;
+        autoDisableAudioTimeout: number;
         accurateSeek: boolean;
         seekType: string;
         seekParamStart: string;

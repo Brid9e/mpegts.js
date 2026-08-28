@@ -23,6 +23,7 @@ enum MSEEvents {
     BUFFER_FULL = 'buffer_full',
     START_STREAMING = 'start_streaming',
     END_STREAMING = 'end_streaming',
+    AUDIO_DISABLED = 'audio_disabled',
 };
 
 export default MSEEvents;

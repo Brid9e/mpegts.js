@@ -43,6 +43,7 @@ declare class MSEController {
         video: any[];
         audio: any[];
     };
+    _audioDisabled: boolean;
     destroy(): void;
     on(event: any, listener: any): void;
     off(event: any, listener: any): void;

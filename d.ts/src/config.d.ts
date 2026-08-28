@@ -20,6 +20,8 @@ export function createDefaultConfig(): {
     autoCleanupMinBackwardDuration: number;
     statisticsInfoReportInterval: number;
     fixAudioTimestampGap: boolean;
+    autoDisableAudioOnUnsupportedCodec: boolean;
+    autoDisableAudioTimeout: number;
     accurateSeek: boolean;
     seekType: string;
     seekParamStart: string;
@@ -52,6 +54,8 @@ export namespace defaultConfig {
     let autoCleanupMinBackwardDuration: number;
     let statisticsInfoReportInterval: number;
     let fixAudioTimestampGap: boolean;
+    let autoDisableAudioOnUnsupportedCodec: boolean;
+    let autoDisableAudioTimeout: number;
     let accurateSeek: boolean;
     let seekType: string;
     let seekParamStart: string;

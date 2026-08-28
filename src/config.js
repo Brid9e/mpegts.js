@@ -47,6 +47,12 @@ export const defaultConfig = {
 
     fixAudioTimestampGap: true,
 
+    // If audio codec is unsupported, disable audio track instead of throwing error
+    autoDisableAudioOnUnsupportedCodec: false,
+
+    // If > 0, disable audio track when no audio metadata received within N ms after video metadata
+    autoDisableAudioTimeout: 0,
+
     accurateSeek: false,
     seekType: 'range',  // [range, param, custom]
     seekParamStart: 'bstart',

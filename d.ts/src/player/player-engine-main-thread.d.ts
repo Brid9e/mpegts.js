@@ -40,6 +40,7 @@ declare class PlayerEngineMainThread implements PlayerEngine {
     private _onMSEUpdateEnd;
     private _onMSEBufferFull;
     private _onMSEError;
+    private _onMSEAudioDisabled;
     private _onMSEStartStreaming;
     private _onMSEEndStreaming;
     private _onMediaLoadedMetadata;

@@ -77,6 +77,8 @@ class FLVDemuxer {
         this._audioInitialMetadataDispatched = false;
         this._videoInitialMetadataDispatched = false;
 
+        this._audioDisableTimeout = null;
+
         this._mediaInfo = new MediaInfo();
         this._mediaInfo.hasAudio = this._hasAudio;
         this._mediaInfo.hasVideo = this._hasVideo;
@@ -122,6 +124,7 @@ class FLVDemuxer {
     }
 
     destroy() {
+        this._clearAudioDisableTimeout();
         this._mediaInfo = null;
         this._metadata = null;
         this._audioMetadata = null;
@@ -179,7 +182,14 @@ class FLVDemuxer {
     }
 
     set onTrackMetadata(callback) {
-        this._onTrackMetadata = callback;
+        this._onTrackMetadata = (type, metadata) => {
+            if (type === 'audio') {
+                this._clearAudioDisableTimeout();
+            } else if (type === 'video') {
+                this._startAudioDisableTimeout();
+            }
+            callback(type, metadata);
+        };
     }
 
     // prototype: function(mediaInfo: MediaInfo): void
@@ -273,6 +283,55 @@ class FLVDemuxer {
         this._hasVideoFlagOverrided = true;
         this._hasVideo = hasVideo;
         this._mediaInfo.hasVideo = hasVideo;
+    }
+
+    _applyAudioDisabled(reason) {
+        this._clearAudioDisableTimeout();
+        Log.w(this.TAG, 'Flv: Auto disable audio track, reason: ' + reason);
+        this._hasAudioFlagOverrided = true;
+        this._hasAudio = false;
+        let mi = this._mediaInfo;
+        mi.hasAudio = false;
+        // Drop audio codec info and recompute mimeType so mediaInfo can complete
+        // and be re-dispatched to the player with hasAudio=false
+        mi.audioCodec = null;
+        mi.audioSampleRate = null;
+        mi.audioChannelCount = null;
+        if (mi.videoCodec != null) {
+            mi.mimeType = 'video/x-flv; codecs="' + mi.videoCodec + '"';
+        }
+        if (mi.isComplete() && this._onMediaInfo) {
+            this._onMediaInfo(mi);
+        }
+    }
+
+    _disableAudioTrack(reason) {
+        if (this._config.autoDisableAudioOnUnsupportedCodec !== true) {
+            return false;
+        }
+        this._applyAudioDisabled(reason);
+        return true;
+    }
+
+    _clearAudioDisableTimeout() {
+        if (this._audioDisableTimeout != null) {
+            clearTimeout(this._audioDisableTimeout);
+            this._audioDisableTimeout = null;
+        }
+    }
+
+    _startAudioDisableTimeout() {
+        const timeout = this._config.autoDisableAudioTimeout;
+        if (!timeout || this._audioDisableTimeout != null || this._hasAudio !== true || this._hasAudioFlagOverrided === true) {
+            return;
+        }
+        this._audioDisableTimeout = setTimeout(() => {
+            this._audioDisableTimeout = null;
+            if (this._audioMetadata != null || this._hasAudio !== true) {
+                return;
+            }
+            this._applyAudioDisabled(`No audio metadata received within ${timeout}ms`);
+        }, timeout);
     }
 
     resetMediaInfo() {
@@ -537,7 +596,9 @@ class FLVDemuxer {
                 this._parseFlacAudioPacket(arrayBuffer, dataOffset + 5, dataSize - 5, tagTimestamp, packetType);
                 break;
             default:
-                this._onError(DemuxErrors.CODEC_UNSUPPORTED, 'Flv: Unsupported audio codec: ' + fourcc);
+                if (!this._disableAudioTrack('Unsupported audio codec: ' + fourcc)) {
+                    this._onError(DemuxErrors.CODEC_UNSUPPORTED, 'Flv: Unsupported audio codec: ' + fourcc);
+                }
             }
 
             return;
@@ -545,6 +606,9 @@ class FLVDemuxer {
         // Legacy FLV
 
         if (soundFormat !== 2 && soundFormat !== 3 && soundFormat !== 7 && soundFormat !== 10) {  // PCM or MP3 or G711 PCMA or AAC
+            if (this._disableAudioTrack('Unsupported audio codec idx: ' + soundFormat)) {
+                return;
+            }
             this._onError(DemuxErrors.CODEC_UNSUPPORTED, 'Flv: Unsupported audio codec idx: ' + soundFormat);
             return;
         }
@@ -554,6 +618,9 @@ class FLVDemuxer {
         if (soundRateIndex >= 0 && soundRateIndex <= 4) {
             soundRate = this._flvSoundRateTable[soundRateIndex];
         } else {
+            if (this._disableAudioTrack('Invalid audio sample rate idx: ' + soundRateIndex)) {
+                return;
+            }
             this._onError(DemuxErrors.FORMAT_ERROR, 'Flv: Invalid audio sample rate idx: ' + soundRateIndex);
             return;
         }

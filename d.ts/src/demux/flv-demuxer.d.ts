@@ -12,7 +12,7 @@ declare class FLVDemuxer {
     _onMediaInfo: any;
     _onMetaDataArrived: any;
     _onScriptDataArrived: any;
-    _onTrackMetadata: any;
+    _onTrackMetadata: (type: any, metadata: any) => void;
     _onDataAvailable: any;
     _onSeiArrived: any;
     _onG711AudioData: any;
@@ -25,6 +25,7 @@ declare class FLVDemuxer {
     _hasVideoFlagOverrided: boolean;
     _audioInitialMetadataDispatched: boolean;
     _videoInitialMetadataDispatched: boolean;
+    _audioDisableTimeout: any;
     _mediaInfo: MediaInfo;
     _metadata: {};
     _audioMetadata: {};
@@ -65,8 +66,8 @@ declare class FLVDemuxer {
     _littleEndian: boolean;
     destroy(): void;
     bindDataSource(loader: any): this;
-    set onTrackMetadata(callback: any);
-    get onTrackMetadata(): any;
+    set onTrackMetadata(callback: (type: any, metadata: any) => void);
+    get onTrackMetadata(): (type: any, metadata: any) => void;
     set onMediaInfo(callback: any);
     get onMediaInfo(): any;
     set onMetaDataArrived(callback: any);
@@ -87,6 +88,10 @@ declare class FLVDemuxer {
     get overridedDuration(): number;
     set overridedHasAudio(hasAudio: any);
     set overridedHasVideo(hasVideo: any);
+    _applyAudioDisabled(reason: any): void;
+    _disableAudioTrack(reason: any): boolean;
+    _clearAudioDisableTimeout(): void;
+    _startAudioDisableTimeout(): void;
     resetMediaInfo(): void;
     _isInitialMetadataDispatched(): boolean;
     parseChunks(chunk: any, byteStart: any): number;

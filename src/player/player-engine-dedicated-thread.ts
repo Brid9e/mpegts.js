@@ -390,6 +390,11 @@ class PlayerEngineDedicatedThread implements PlayerEngine {
                     this._onMSEUpdateEnd();
                 } else if (packet.event == MSEEvents.BUFFER_FULL) {
                     this._onMSEBufferFull();
+                } else if (packet.event == MSEEvents.AUDIO_DISABLED) {
+                    if (this._media_info) {
+                        this._media_info.hasAudio = false;
+                        this._emitter.emit(PlayerEvents.MEDIA_INFO, Object.assign({}, this._media_info));
+                    }
                 }
                 break;
             }

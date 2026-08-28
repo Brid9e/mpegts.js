@@ -130,6 +130,7 @@ class PlayerEngineMainThread implements PlayerEngine {
         this._mse_controller.on(MSEEvents.BUFFER_FULL, this._onMSEBufferFull.bind(this));
         this._mse_controller.on(MSEEvents.SOURCE_OPEN, this._onMSESourceOpen.bind(this));
         this._mse_controller.on(MSEEvents.ERROR, this._onMSEError.bind(this));
+        this._mse_controller.on(MSEEvents.AUDIO_DISABLED, this._onMSEAudioDisabled.bind(this));
         this._mse_controller.on(MSEEvents.START_STREAMING, this._onMSEStartStreaming.bind(this));
         this._mse_controller.on(MSEEvents.END_STREAMING, this._onMSEEndStreaming.bind(this));
 
@@ -384,6 +385,13 @@ class PlayerEngineMainThread implements PlayerEngine {
 
     private _onMSEError(info: any): void {
         this._emitter.emit(PlayerEvents.ERROR, ErrorTypes.MEDIA_ERROR, ErrorDetails.MEDIA_MSE_ERROR, info);
+    }
+
+    private _onMSEAudioDisabled(): void {
+        if (this._media_info) {
+            this._media_info.hasAudio = false;
+            this._emitter.emit(PlayerEvents.MEDIA_INFO, Object.assign({}, this._media_info));
+        }
     }
 
     private _onMSEStartStreaming(): void {

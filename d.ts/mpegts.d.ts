@@ -174,6 +174,16 @@ declare namespace Mpegts {
          * @defaultvalue true
          */
         fixAudioTimestampGap?: boolean;
+        /**
+         * @desc Disable audio track automatically when audio codec is unsupported, instead of throwing error.
+         * @defaultvalue false
+         */
+        autoDisableAudioOnUnsupportedCodec?: boolean;
+        /**
+         * @desc If greater than 0, disable audio track when no audio metadata received within N ms after video metadata.
+         * @defaultvalue 0
+         */
+        autoDisableAudioTimeout?: number;
 
         /**
          * @desc Accurate seek to any frame, not limited to video IDR frame, but may a bit slower.

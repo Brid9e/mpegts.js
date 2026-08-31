@@ -88,6 +88,8 @@ In multipart mode, `duration` `filesize` `url` field in `MediaDataSource` struct
 | `autoCleanupMaxBackwardDuration` | `number`  | `3 * 60`                     | When backward buffer duration exceeded this value (in seconds), do auto cleanup for SourceBuffer |
 | `autoCleanupMinBackwardDuration` | `number`  | `2 * 60`                     | Indicates the duration in seconds to reserve for backward buffer when doing auto cleanup. |
 | `fixAudioTimestampGap`           | `boolean` | `true`                       | Fill silent audio frames to avoid a/v unsync when detect large audio timestamp gap. |
+| `autoDisableAudioOnUnsupportedCodec` | `boolean` | `false`                   | Automatically disable the audio track when the audio codec is unsupported (by demuxer or MSE), instead of throwing a `MEDIA_CODEC_UNSUPPORTED` error. `mediaInfo.hasAudio` will be updated to `false`. |
+| `autoDisableAudioTimeout`        | `number`  | `0`                          | If greater than `0`, disable the audio track when no audio metadata is received within N ms after the video metadata arrived. Useful for streams whose FLV header claims `hasAudio=true` but never delivers audio data. `0` disables this check. |
 | `accurateSeek?`                  | `boolean` | `false`                      | Accurate seek to any frame, not limited to video IDR frame, but may a bit slower. Available on `Chrome > 50`, `FireFox` and `Safari`. |
 | `seekType?`                      | `string`  | `'range'`                    | `'range'` use range request to seek, or `'param'` add params into url to indicate request range. |
 | `seekParamStart?`                | `string`  | `'bstart'`                   | Indicates seek start parameter name for `seekType = 'param'` |

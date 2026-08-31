@@ -134,6 +134,24 @@ npm run build               # packaged & minimized js will be emitted in dist fo
 ## API and Configuration
 参阅 [api.md](docs/api.md)
 
+### 自动禁用音轨
+
+部分流会在 FLV 头或 `onMetaData` 中声明存在音轨（例如 `hasAudio: true`），但实际上并不会提供可用的音频数据——要么音频编码不受支持，要么根本没有音频数据到达。默认情况下，mpegts.js 遇到这种情况会抛出 `MEDIA_CODEC_UNSUPPORTED` 错误，可能导致原本可以播放的纯视频流播放失败。
+
+以下两个配置项可以让播放器自动回退为纯视频播放：
+
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `autoDisableAudioOnUnsupportedCodec` | `false` | 音频编码不受支持（解封装器或 MSE 层面）时自动禁用音轨，而不是抛出错误。`mediaInfo.hasAudio` 会更新为 `false`。 |
+| `autoDisableAudioTimeout` | `0` | 大于 `0` 时，视频元数据到达后 N 毫秒内没有收到音频元数据，则自动禁用音轨。适用于 FLV 头声明 `hasAudio=true` 但实际上没有音频数据的流。 |
+
+```js
+mpegts.createPlayer(mediaDataSource, {
+    autoDisableAudioOnUnsupportedCodec: true,
+    autoDisableAudioTimeout: 3000,
+});
+```
+
 ## Debug
 ```bash
 npm install                 # install dev-dependencies

@@ -135,6 +135,24 @@ See [livestream.md](docs/livestream.md)
 ## API and Configuration
 See [api.md](docs/api.md)
 
+### Auto-disable the audio track
+
+Some streams advertise an audio track (for example `hasAudio: true` in the FLV header or `onMetaData`) but never deliver usable audio — the codec is unsupported, or no audio data actually arrives. By default mpegts.js raises a `MEDIA_CODEC_UNSUPPORTED` error in that case, which can break playback of an otherwise playable video-only stream.
+
+Two config options let the player automatically fall back to video-only playback:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `autoDisableAudioOnUnsupportedCodec` | `false` | Disable the audio track when the audio codec is unsupported (by demuxer or MSE) instead of throwing an error. `mediaInfo.hasAudio` is updated to `false`. |
+| `autoDisableAudioTimeout` | `0` | If greater than `0`, disable the audio track when no audio metadata is received within N ms after the video metadata arrived. Useful for streams whose FLV header claims `hasAudio=true` but never delivers audio data. |
+
+```js
+mpegts.createPlayer(mediaDataSource, {
+    autoDisableAudioOnUnsupportedCodec: true,
+    autoDisableAudioTimeout: 3000,
+});
+```
+
 ## Debug
 ```bash
 npm install                 # install dev-dependencies
